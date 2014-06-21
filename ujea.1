@@ -1,0 +1,13 @@
+.TH ujea 1
+.SH NAME
+ujea \- Universal job execution agent via AMQP queue
+.SH SYNOPSIS
+.B ujea
+.IR URL
+.SH DESCRIPTION
+.B ujea
+simple event-based daemon which reads AMQP queue, executes jobs and returns stdout/stderr to queue
+.SH OPTIONS
+.TP
+.BR \fIURL\fR
+AMQP url of jobs queue.

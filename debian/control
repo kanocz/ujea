@@ -1,0 +1,13 @@
+Source: ujea
+Section: net
+Priority: extra
+Maintainer: Anton Skorokhod <anton@nsl.cz>
+Build-Depends: debhelper (>= 9), qtbase5-dev, cdbs
+Standards-Version: 3.9.5
+
+Package: ujea
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: monitors AMQP queue and runs posted jobs
+ Simple event-based daemon which reads AMQP queue,
+ executes jobs and returns stdout/stderr to queue
