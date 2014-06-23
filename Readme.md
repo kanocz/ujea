@@ -92,6 +92,7 @@ Posting a job
   on long-runnig jobs you may get more "stdOut" and/or "stdErr" messages during execution
   
   **IMPORTANT: jobId must be unique for every job (cat be any string), exec message with duplicated jobId will be ignored**
+    but you can start job with the same jobId after previos one finished
   
   it's possible to terminate running job in 2 ways (using TERM and KILL signals):
 ```

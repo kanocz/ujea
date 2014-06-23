@@ -147,7 +147,9 @@ void JobsExecuter::processFinised(int exitCode, QProcess::ExitStatus exitStatus)
   msg["exitCode"] = exitCode;
   sendReply(msg);
   if (sender()) {
-      sender()->deleteLater();
+      QProcess *process = qobject_cast<QProcess *>(sender());
+      m_pool.remove(process->property("job").toString());
+      process->deleteLater();
   }
 }
 
