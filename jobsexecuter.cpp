@@ -66,6 +66,11 @@ void JobsExecuter::newCommand()
       emit cmdTerminate(jobid);
     } else if (type == "kill") {
       emit cmdKill(jobid);
+    } else if (type == "close") {
+      emit cmdClose(jobid);
+    } else if (type == "stdin") {
+      QByteArray data = QByteArray::fromBase64(msg.value("stdin").toByteArray());
+      emit cmdStdin(jobid, data);
     }
 }
 
@@ -109,6 +114,28 @@ void JobsExecuter::cmdKill(QString job)
     }
 
   m_pool.value(job)->kill();
+}
+
+void JobsExecuter::cmdStdin(QString job, QByteArray indata)
+{
+    if (!m_pool.contains(job)) {
+        qDebug() << "Close of unknown job, jobid = " + job;
+        return;
+      }
+
+    QProcess *process = m_pool[job];
+    process->write(indata);
+}
+
+void JobsExecuter::cmdClose(QString job)
+{
+    if (!m_pool.contains(job)) {
+        qDebug() << "Close of unknown job, jobid = " + job;
+        return;
+      }
+
+    QProcess *process = m_pool[job];
+    process->closeWriteChannel();
 }
 
 void JobsExecuter::processError(QProcess::ProcessError error)

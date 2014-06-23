@@ -61,8 +61,7 @@ Posting a job
 
   Additional option is to pass "stdin" argument in base64 encoding. In this case ujea will send content of this argumet
  to the stdin of executed process and then close this stream to indicate end of input. Empty argument'll just close. No
- argument just not to close :)
-  
+ argument just not to close :)  
   So you can post message like this:
 ```
   amqp-publish -r ubuntu-devel_cmd -b '{"type":"exec","jobId":"2","cmd":"/bin/cat","stdin":"SGVsbG8sIHdvcmxkIQ=="}'
@@ -89,8 +88,14 @@ Posting a job
       "type": "status"
   }
 ```
-  on long-runnig jobs you may get more "stdOut" and/or "stdErr" messages during execution
-  
+  on long-runnig jobs you may get more "stdOut" and/or "stdErr" messages during execution  
+  now is also posible to send "stdin" and "close" messages to use job as interactive application. This will send
+'Hello world' 2 times and then close stdin (something like Ctrl+D in shell):
+```
+amqp-publish -r ubuntu-devel_cmd -b '{"type":"stdin","jobId":"11","stdin":"SGVsbG8sIHdvcmxkIQ=="}'
+amqp-publish -r ubuntu-devel_cmd -b '{"type":"stdin","jobId":"11","stdin":"SGVsbG8sIHdvcmxkIQ=="}'
+amqp-publish -r ubuntu-devel_cmd -b '{"type":"close","jobId":"11","stdin":"asd"}'
+```
   **IMPORTANT: jobId must be unique for every job (cat be any string), exec message with duplicated jobId will be ignored**
     but you can start job with the same jobId after previos one finished
   

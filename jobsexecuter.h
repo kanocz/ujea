@@ -29,6 +29,8 @@ protected slots:
   void cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata);
   void cmdTerminate(QString job);
   void cmdKill(QString job);
+  void cmdStdin(QString job, QByteArray indata);
+  void cmdClose(QString job);
 
   void processError(QProcess::ProcessError error);
   void processFinised(int exitCode, QProcess::ExitStatus exitStatus);
