@@ -1,3 +1,11 @@
+ujea (1.1) network; urgency=medium
+
+  * Stdin and close commands
+  * Alive messages
+  * Allow job restarting after finish with same jobId
+
+ -- Anton Skorokhod <anton@nsl.cz>  Mon, 23 Jun 2014 16:55:04 +0200
+
 ujea (1.0) network; urgency=medium
 
   * Initial release.
