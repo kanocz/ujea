@@ -5,8 +5,8 @@
 
 #include <QDebug>
 
-JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, QObject *parent) :
-  QObject(parent), m_url(address), m_hostname(hostname)
+JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, int aliveInterval, int aliveTTL, QObject *parent) :
+  QObject(parent), m_url(address), m_hostname(hostname), m_aliveTTL(aliveTTL)
 {
   m_client = new QAMQP::Client(this);
   m_client->open(m_url);
@@ -25,6 +25,9 @@ JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, QObject *paren
   m_qOut = m_client->createQueue(m_exchange->channelNumber());
   m_qOut->declare(m_hostname + "_rpl", QAMQP::Queue::Durable);
 
+  connect(&aliveTimer, SIGNAL(timeout()), this, SLOT(sendAlive()));
+  aliveTimer.setInterval(aliveInterval);
+  aliveTimer.start();
 }
 
 void JobsExecuter::newCommand()
@@ -179,6 +182,23 @@ void JobsExecuter::processStderr()
   QVariantMap msg = prepareReply("stdErr");
   msg["data"] = qobject_cast<QProcess *>(sender())->readAllStandardError().toBase64();
   sendReply(msg);
+}
+
+void JobsExecuter::sendAlive()
+{
+    QVariantMap msg;
+    msg["type"] = "alive";
+    msg["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+    auto jobsS = m_pool.keys();
+    QList<QVariant> jobs;
+    for (QString job : jobsS) {
+        jobs.append(job);
+    }
+    msg["active"] = jobs;
+    QAMQP::Exchange::MessageProperties properties;
+    properties[QAMQP::Frame::Content::cpExpiration] = m_aliveTTL; // for this time of messages only 1.5 seconds of live
+    m_exchange->publish(QJsonDocument::fromVariant(msg).toJson(), m_qOut->name(), properties);
+    qDebug() << msg;
 }
 
 void JobsExecuter::sendReply(QVariantMap reply)

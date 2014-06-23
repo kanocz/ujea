@@ -118,4 +118,22 @@ Posting a job
       "type": "status"
   }
 ```
+
+  you'll recive also alive messages (interval can be set via command line parameters)... they looks like this:
+```
+{
+    "active": [ ],
+    "timestamp": 1403531280910,
+    "type": "alive"
+}
+
+{
+    "active": [ "11", "4" ],
+    "timestamp": 1403532991912,
+    "type": "alive"
+}
+```
+
   that's all :) if you have any questions, please email me
+
+

@@ -6,6 +6,7 @@
 #include <QVariantMap>
 #include <QMap>
 #include <QProcess>
+#include <QTimer>
 
 #include "qamqp/src/qamqp/amqp.h"
 #include "qamqp/src/qamqp/amqp_queue.h"
@@ -15,7 +16,7 @@ class JobsExecuter : public QObject
 {
   Q_OBJECT
 public:
-  explicit JobsExecuter(const QUrl& address, QString hostname, QObject *parent = 0);
+  explicit JobsExecuter(const QUrl& address, QString hostname, int aliveInterval, int aliveTTL, QObject *parent = 0);
 
 signals:
 
@@ -35,9 +36,12 @@ protected slots:
   void processStdout();
   void processStderr();
 
+  void sendAlive();
+
 private:
   QUrl m_url;
   QString m_hostname;
+  int m_aliveTTL;
 
   QAMQP::Client* m_client;
   QAMQP::Queue* m_qIn;
@@ -45,6 +49,8 @@ private:
 
   QAMQP::Exchange* m_exchange;
   QMap<QString, QProcess*> m_pool;
+
+  QTimer aliveTimer;
 
   void sendReply(QVariantMap reply);
   QVariantMap prepareReply(QString type, QString job = QString());
