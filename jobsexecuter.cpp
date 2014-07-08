@@ -1,4 +1,6 @@
 #include "jobsexecuter.h"
+#include "sysinfo.h"
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDateTime>
@@ -222,6 +224,11 @@ void JobsExecuter::sendAlive()
         jobs.append(job);
     }
     msg["active"] = jobs;
+
+    // add some system information
+    msg["loadavg"] = loadavg1();
+    msg["ncpu"] = numCpu();
+
     QAMQP::Exchange::MessageProperties properties;
     properties[QAMQP::Frame::Content::cpExpiration] = m_aliveTTL; // for this time of messages only 1.5 seconds of live
     m_exchange->publish(QJsonDocument::fromVariant(msg).toJson(), m_qOut->name(), properties);

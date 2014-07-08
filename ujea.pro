@@ -15,12 +15,14 @@ CONFIG   -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    jobsexecuter.cpp
+    jobsexecuter.cpp \
+    sysinfo.cpp
 
 include(qamqp/src/qamqp/qamqp.pri)
 
 HEADERS += \
-    jobsexecuter.h
+    jobsexecuter.h \
+    sysinfo.h
 
 isEmpty( PREFIX ){
   PREFIX =/usr
