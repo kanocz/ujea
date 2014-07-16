@@ -63,7 +63,10 @@ void JobsExecuter::newCommand()
       QString cmd = msg.value("cmd").toString();
       QStringList args = msg.value("args").toStringList();
       QByteArray data = QByteArray::fromBase64(msg.value("stdin").toByteArray());
-      emit cmdExec(jobid, cmd, args, data);
+      QVariantList env;
+      if (msg.contains("env"))
+          env = msg.value("env").toList();
+      emit cmdExec(jobid, cmd, args, data, env);
     } else if (type == "terminate") {
       emit cmdTerminate(jobid);
     } else if (type == "kill") {
@@ -76,7 +79,7 @@ void JobsExecuter::newCommand()
     }
 }
 
-void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata)
+void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env)
 {
   if (m_pool.contains(job)) {
       qDebug() << "Duplicate jobid " + job;
@@ -91,6 +94,20 @@ void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByte
   connect(process, SIGNAL(started()), this, SLOT(processStarted()));
   connect(process, SIGNAL(readyReadStandardError()), this, SLOT(processStderr()));
   connect(process, SIGNAL(readyReadStandardOutput()), this, SLOT(processStdout()));
+
+  QStringList processEnv;
+  if (env.empty())
+  {
+    processEnv << "PATH=/bin:/usr/bin";
+    processEnv << "SHELL=/bin/bash";
+    processEnv << "LANG=C";
+    processEnv << "LC_ALL=C";
+  } else {
+    for (QVariant s : env)
+      processEnv.append(s.toString());
+  }
+
+  process->setEnvironment(processEnv);
 
   process->start(cmdline, args);
   if (!indata.isNull() && !indata.isEmpty()) {

@@ -26,7 +26,7 @@ protected slots:
 
   void newCommand();
 
-  void cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata);
+  void cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env);
   void cmdTerminate(QString job);
   void cmdKill(QString job);
   void cmdStdin(QString job, QByteArray indata);

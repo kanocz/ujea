@@ -61,10 +61,11 @@ Posting a job
 
   Additional option is to pass "stdin" argument in base64 encoding. In this case ujea will send content of this argumet
  to the stdin of executed process and then close this stream to indicate end of input. Empty argument'll just close. No
- argument just not to close :)  
+ argument just not to close :)
+  Also is possible to pass enviropment in env array.
   So you can post message like this:
 ```
-  amqp-publish -r ubuntu-devel_cmd -b '{"type":"exec","jobId":"2","cmd":"/bin/cat","stdin":"SGVsbG8sIHdvcmxkIQ=="}'
+  amqp-publish -r ubuntu-devel_cmd -b '{"type":"exec","jobId":"2","cmd":"/bin/cat","env":["PATH=/bin:/usr/bin","LANG=ru_RU","LC_ALL=ru_RU.UTF8"],"stdin":"SGVsbG8sIHdvcmxkIQ=="}'
 ```
   And get such result:
 ```
