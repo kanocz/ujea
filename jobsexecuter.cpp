@@ -5,7 +5,9 @@
 #include <QJsonObject>
 #include <QDateTime>
 
-#include <QDebug>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(LOG_JE, "jobexecuter")
 
 JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, int aliveInterval, int aliveTTL, QObject *parent) :
   QObject(parent), m_url(address), m_hostname(hostname), m_aliveTTL(aliveTTL)
@@ -35,7 +37,7 @@ JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, int aliveInter
 void JobsExecuter::newCommand()
 {
   QAMQP::MessagePtr message = m_qIn->getMessage();
-  qDebug() << "JobsExecuter::newMessage " << message->payload;
+  qCDebug(LOG_JE) << "JobsExecuter::newMessage " << message->payload;
 
   QByteArray bMessage = message->payload;
   m_qIn->ack(message);
@@ -44,13 +46,13 @@ void JobsExecuter::newCommand()
   auto doc = QJsonDocument::fromJson(bMessage, &parseResult);
 
   if (parseResult.error != QJsonParseError::NoError) {
-      qDebug() << "Error parsing message: " + parseResult.errorString();
+      qCWarning(LOG_JE) << "Error parsing message: " + parseResult.errorString();
       return;
     }
 
   // we need { } style messages, ignore all other :)
   if (!doc.isObject()) {
-      qDebug() << "Message is not an object: " + bMessage;
+      qCWarning(LOG_JE) << "Message is not an object: " + bMessage;
       return;
     }
 
@@ -82,7 +84,7 @@ void JobsExecuter::newCommand()
 void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env)
 {
   if (m_pool.contains(job)) {
-      qDebug() << "Duplicate jobid " + job;
+      qCWarning(LOG_JE) << "Duplicate jobid " + job;
       return;
     }
   QProcess *process = new QProcess(this);
@@ -118,7 +120,7 @@ void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByte
 void JobsExecuter::cmdTerminate(QString job)
 {
   if (!m_pool.contains(job)) {
-      qDebug() << "Terminate of unknown job, jobid = " + job;
+      qCWarning(LOG_JE) << "Terminate of unknown job, jobid = " + job;
       return;
     }
 
@@ -128,7 +130,7 @@ void JobsExecuter::cmdTerminate(QString job)
 void JobsExecuter::cmdKill(QString job)
 {
   if (!m_pool.contains(job)) {
-      qDebug() << "Kill of unknown job, jobid = " + job;
+      qCWarning(LOG_JE) << "Kill of unknown job, jobid = " + job;
       return;
     }
 
@@ -138,7 +140,7 @@ void JobsExecuter::cmdKill(QString job)
 void JobsExecuter::cmdStdin(QString job, QByteArray indata)
 {
     if (!m_pool.contains(job)) {
-        qDebug() << "Close of unknown job, jobid = " + job;
+        qCWarning(LOG_JE) << "Close of unknown job, jobid = " + job;
         return;
       }
 
@@ -149,7 +151,7 @@ void JobsExecuter::cmdStdin(QString job, QByteArray indata)
 void JobsExecuter::cmdClose(QString job)
 {
     if (!m_pool.contains(job)) {
-        qDebug() << "Close of unknown job, jobid = " + job;
+        qCWarning(LOG_JE) << "Close of unknown job, jobid = " + job;
         return;
       }
 
@@ -249,7 +251,7 @@ void JobsExecuter::sendAlive()
     QAMQP::Exchange::MessageProperties properties;
     properties[QAMQP::Frame::Content::cpExpiration] = m_aliveTTL; // for this time of messages only 1.5 seconds of live
     m_exchange->publish(QJsonDocument::fromVariant(msg).toJson(), m_qOut->name(), properties);
-    qDebug() << msg;
+    qCDebug(LOG_JE) << "alive" << msg;
 }
 
 void JobsExecuter::sendReply(QVariantMap reply)
@@ -257,7 +259,7 @@ void JobsExecuter::sendReply(QVariantMap reply)
   QAMQP::Exchange::MessageProperties properties;
   properties[QAMQP::Frame::Content::cpDeliveryMode] = 2; // Make message persistent
   m_exchange->publish(QJsonDocument::fromVariant(reply).toJson(), m_qOut->name(), properties);
-  qDebug() << reply;
+  qCDebug(LOG_JE) << "reply" << reply;
 }
 
 QVariantMap JobsExecuter::prepareReply(QString type, QString job)
