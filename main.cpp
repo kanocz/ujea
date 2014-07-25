@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
   // some command line arguments parsing stuff
   QCoreApplication::setApplicationName("ujea");
-  QCoreApplication::setApplicationVersion("1.1");
+  QCoreApplication::setApplicationVersion("1.2");
 
   QCommandLineParser parser;
   parser.setApplicationDescription("Universal job execution agent using AMQP queue");

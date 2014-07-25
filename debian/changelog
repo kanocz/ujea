@@ -1,3 +1,12 @@
+ujea (1.2) network; urgency=medium
+
+  * Q log categories
+  * Tempfile paramater
+  * Enviropment variables
+  * System info (loadavg, cpu num)
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sat, 26 Jul 2014 00:02:08 +0200
+
 ujea (1.1) network; urgency=medium
 
   * Stdin and close commands
