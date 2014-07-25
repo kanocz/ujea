@@ -125,6 +125,9 @@ amqp-publish -r ubuntu-devel_cmd -b '{"type":"close","jobId":"11","stdin":"asd"}
   }
 ```
 
+If exec command gets "tempfile" parameter (base64) then it's content after de-base64 will be written to temp file %tempfile% in arguments
+will be replaed with path to this file. This can be used to push scripts before run with specified shell.
+
   you'll recive also alive messages (interval can be set via command line parameters)... they looks like this:
 ```
 {

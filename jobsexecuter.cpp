@@ -65,10 +65,13 @@ void JobsExecuter::newCommand()
       QString cmd = msg.value("cmd").toString();
       QStringList args = msg.value("args").toStringList();
       QByteArray data = QByteArray::fromBase64(msg.value("stdin").toByteArray());
+      QByteArray tempfile;
       QVariantList env;
       if (msg.contains("env"))
           env = msg.value("env").toList();
-      emit cmdExec(jobid, cmd, args, data, env);
+      if (msg.contains("tempfile"))
+          tempfile = QByteArray::fromBase64(msg.value("tempfile").toByteArray());
+      emit cmdExec(jobid, cmd, args, data, env, tempfile);
     } else if (type == "terminate") {
       emit cmdTerminate(jobid);
     } else if (type == "kill") {
@@ -81,7 +84,7 @@ void JobsExecuter::newCommand()
     }
 }
 
-void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env)
+void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env, QByteArray tempfile)
 {
   if (m_pool.contains(job)) {
       qCWarning(LOG_JE) << "Duplicate jobid " + job;
@@ -110,6 +113,19 @@ void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByte
   }
 
   process->setEnvironment(processEnv);
+
+  if (tempfile.size() > 0) {
+      QString tempfilename = tempdir.path() + '/' + job.toUtf8().toHex();
+      qCDebug(LOG_JE) << "creating temp file" << tempfilename;
+      QFile tfile(tempfilename);
+      if (tfile.open(QIODevice::WriteOnly)) {
+          tfile.write(tempfile);
+          tfile.close();
+          args.replaceInStrings("%tempfile%", tempfilename);
+      } else {
+          qCCritical(LOG_JE) << "error while creating temp file" << tempfilename;
+      }
+  }
 
   process->start(cmdline, args);
   if (!indata.isNull() && !indata.isEmpty()) {

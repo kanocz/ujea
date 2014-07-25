@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QProcess>
 #include <QTimer>
+#include <QTemporaryDir>
 
 #include "qamqp/src/qamqp/amqp.h"
 #include "qamqp/src/qamqp/amqp_queue.h"
@@ -26,7 +27,8 @@ protected slots:
 
   void newCommand();
 
-  void cmdExec(QString job, QString cmdline, QStringList args, QByteArray indata, QVariantList env);
+  void cmdExec(QString job, QString cmdline, QStringList args,
+               QByteArray indata, QVariantList env, QByteArray tempfile);
   void cmdTerminate(QString job);
   void cmdKill(QString job);
   void cmdStdin(QString job, QByteArray indata);
@@ -56,6 +58,8 @@ private:
 
   void sendReply(QVariantMap reply);
   QVariantMap prepareReply(QString type, QString job = QString());
+
+  QTemporaryDir tempdir;
 };
 
 #endif // JobsExecuter_H
