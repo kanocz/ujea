@@ -121,6 +121,7 @@ void JobsExecuter::cmdExec(QString job, QString cmdline, QStringList args, QByte
       if (tfile.open(QIODevice::WriteOnly)) {
           tfile.write(tempfile);
           tfile.close();
+          process->setProperty("tempfile", tempfilename);
           args.replaceInStrings("%tempfile%", tempfilename);
       } else {
           qCCritical(LOG_JE) << "error while creating temp file" << tempfilename;
@@ -214,9 +215,14 @@ void JobsExecuter::processFinised(int exitCode, QProcess::ExitStatus exitStatus)
   msg["exitCode"] = exitCode;
   sendReply(msg);
   if (sender()) {
-      QProcess *process = qobject_cast<QProcess *>(sender());
+    QProcess *process = qobject_cast<QProcess *>(sender());
+    if (process) {
       m_pool.remove(process->property("job").toString());
+      if (process->property("tempfile").isValid()) {
+          QFile::remove(process->property("tempfile").toString());
+      }
       process->deleteLater();
+    }
   }
 }
 
