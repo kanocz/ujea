@@ -9,15 +9,16 @@
 
 Q_LOGGING_CATEGORY(LOG_JE, "jobexecuter")
 
-JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, int aliveInterval, int aliveTTL, QObject *parent) :
-  QObject(parent), m_url(address), m_hostname(hostname), m_aliveTTL(aliveTTL)
+JobsExecuter::JobsExecuter(const QUrl &address, QString q_cmd, QString q_rpl,
+                           int aliveInterval, int aliveTTL, QObject *parent) :
+  QObject(parent), m_url(address), m_aliveTTL(aliveTTL)
 {
   m_client = new QAMQP::Client(this);
   m_client->open(m_url);
   m_client->setAutoReconnect(true);
 
   m_qIn = m_client->createQueue();
-  m_qIn->declare(m_hostname + "_cmd", QAMQP::Queue::Durable);
+  m_qIn->declare(q_cmd, QAMQP::Queue::Durable);
   connect(m_qIn, &QAMQP::Queue::declared, this, [this] () {
       m_qIn->setQOS(0,1);
       m_qIn->consume();
@@ -27,7 +28,7 @@ JobsExecuter::JobsExecuter(const QUrl &address, QString hostname, int aliveInter
   m_exchange =  m_client->createExchange();
 
   m_qOut = m_client->createQueue(m_exchange->channelNumber());
-  m_qOut->declare(m_hostname + "_rpl", QAMQP::Queue::Durable);
+  m_qOut->declare(q_rpl, QAMQP::Queue::Durable);
 
   connect(&aliveTimer, SIGNAL(timeout()), this, SLOT(sendAlive()));
   aliveTimer.setInterval(aliveInterval);

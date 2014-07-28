@@ -17,7 +17,8 @@ class JobsExecuter : public QObject
 {
   Q_OBJECT
 public:
-  explicit JobsExecuter(const QUrl& address, QString hostname, int aliveInterval, int aliveTTL, QObject *parent = 0);
+  explicit JobsExecuter(const QUrl& address, QString q_cmd, QString q_rpl,
+                        int aliveInterval, int aliveTTL, QObject *parent = 0);
 
 signals:
 
@@ -44,7 +45,6 @@ protected slots:
 
 private:
   QUrl m_url;
-  QString m_hostname;
   int m_aliveTTL;
 
   QAMQP::Client* m_client;
