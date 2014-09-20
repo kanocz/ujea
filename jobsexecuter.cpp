@@ -270,6 +270,9 @@ void JobsExecuter::sendAlive()
     // add some system information
     msg["loadavg"] = loadavg1();
     msg["ncpu"] = numCpu();
+    struct memory_info mem = memInfo();
+    msg["totalmem"] = mem.totalKB;
+    msg["freemem"] = mem.freeKB;
 
     QAMQP::Exchange::MessageProperties properties;
     properties[QAMQP::Frame::Content::cpExpiration] = m_aliveTTL; // for this time of messages only 1.5 seconds of live

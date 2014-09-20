@@ -1,4 +1,10 @@
-ujea (1.2) network; urgency=medium
+ujea (1.2.1) testing; urgency=medium
+
+  * More system info (total and free memory)
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sat, 20 Sep 2014 22:12:18 +0200
+
+ujea (1.2) testing; urgency=medium
 
   * Q log categories
   * Tempfile paramater
@@ -7,7 +13,7 @@ ujea (1.2) network; urgency=medium
 
  -- Anton Skorokhod <anton@nsl.cz>  Sat, 26 Jul 2014 00:02:08 +0200
 
-ujea (1.1) network; urgency=medium
+ujea (1.1) testing; urgency=medium
 
   * Stdin and close commands
   * Alive messages
@@ -15,7 +21,7 @@ ujea (1.1) network; urgency=medium
 
  -- Anton Skorokhod <anton@nsl.cz>  Mon, 23 Jun 2014 16:55:04 +0200
 
-ujea (1.0) network; urgency=medium
+ujea (1.0) testing; urgency=medium
 
   * Initial release.
 

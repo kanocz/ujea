@@ -133,13 +133,22 @@ will be replaed with path to this file. This can be used to push scripts before 
 {
     "active": [ ],
     "timestamp": 1403531280910,
-    "type": "alive"
+    "type": "alive",
+    "loadavg": "1.24",
+    "ncpu": 24,
+    "totalmem": 2048,
+    "freemem": 329
 }
 
 {
     "active": [ "11", "4" ],
     "timestamp": 1403532991912,
-    "type": "alive"
+    "type": "alive",
+    "loadavg": "4.01",
+    "ncpu": 24,
+    "totalmem": 2048,
+    "freemem": 52
+
 }
 ```
 
