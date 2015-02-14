@@ -6,6 +6,7 @@
 #include <QVariantMap>
 #include <QMap>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QTemporaryDir>
 
@@ -18,7 +19,8 @@ class JobsExecuter : public QObject
   Q_OBJECT
 public:
   explicit JobsExecuter(const QUrl& address, QString q_cmd, QString q_rpl,
-                        int aliveInterval, int aliveTTL, QObject *parent = 0);
+                        int aliveInterval, int aliveTTL, QString execRegex,
+                        QObject *parent = 0);
 
 signals:
 
@@ -34,6 +36,7 @@ protected slots:
   void cmdKill(QString job);
   void cmdStdin(QString job, QByteArray indata);
   void cmdClose(QString job);
+  void cmdError(QString job, QString error);
 
   void processError(QProcess::ProcessError error);
   void processFinised(int exitCode, QProcess::ExitStatus exitStatus);
@@ -60,6 +63,7 @@ private:
   QVariantMap prepareReply(QString type, QString job = QString());
 
   QTemporaryDir tempdir;
+  QRegularExpression execRe;
 };
 
 #endif // JobsExecuter_H

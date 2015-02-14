@@ -10,9 +10,12 @@
 Q_LOGGING_CATEGORY(LOG_JE, "jobexecuter")
 
 JobsExecuter::JobsExecuter(const QUrl &address, QString q_cmd, QString q_rpl,
-                           int aliveInterval, int aliveTTL, QObject *parent) :
+                           int aliveInterval, int aliveTTL, QString execRegex,
+                           QObject *parent) :
   QObject(parent), m_url(address), m_aliveTTL(aliveTTL)
 {
+  execRe.setPattern(execRegex);
+
   m_client = new QAMQP::Client(this);
   m_client->open(m_url);
   m_client->setAutoReconnect(true);
@@ -64,6 +67,12 @@ void JobsExecuter::newCommand()
 
   if (type == "exec") {
       QString cmd = msg.value("cmd").toString();
+
+      if (!execRe.match(cmd).hasMatch()) {
+        emit cmdError(jobid, "Not permited command");
+        return;
+      }
+
       QStringList args = msg.value("args").toStringList();
       QByteArray data = QByteArray::fromBase64(msg.value("stdin").toByteArray());
       QByteArray tempfile;
@@ -175,6 +184,17 @@ void JobsExecuter::cmdClose(QString job)
 
     QProcess *process = m_pool[job];
     process->closeWriteChannel();
+}
+
+void JobsExecuter::cmdError(QString job, QString error)
+{
+  QVariantMap msg;
+  msg["type"] = "status";
+  msg["jobId"] = job;
+  msg["timestamp"] = QDateTime::currentMSecsSinceEpoch();
+  msg["status"] = "error";
+  msg["message"] = error;
+  sendReply(msg);
 }
 
 void JobsExecuter::processError(QProcess::ProcessError error)

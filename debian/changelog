@@ -1,3 +1,9 @@
+ujea (1.2.2) testing; urgency=medium
+
+  * Regex for permiting only specified commands to exec
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sat, 14 Feb 2015 23:33:26 +0100
+
 ujea (1.2.1) testing; urgency=medium
 
   * More system info (total and free memory)

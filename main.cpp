@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
   parser.addOption(QCommandLineOption("aliveTTL", "TTL in queue for alive messages (1500).", "aliveTTL", "1500"));
   parser.addOption(QCommandLineOption("queueCmd", "Commands queue name ("+hostname+"_cmd).", "queueCmd", hostname+"_cmd"));
   parser.addOption(QCommandLineOption("queueRpl", "Replays queue name ("+hostname+"_rpl).", "queueRpl", hostname+"_rpl"));
+  parser.addOption(QCommandLineOption("execRegex", "Regex for permited commands. (none)", "execRegex", ""));
   parser.addPositionalArgument("url", QCoreApplication::translate("main", "AMQP url"));
   parser.process(app);
 
@@ -32,7 +33,8 @@ int main(int argc, char *argv[])
 
   // create and execure worker
   JobsExecuter qw{QUrl(args.value(0)), parser.value("queueCmd"), parser.value("queueRpl"),
-              parser.value("aliveInterval").toInt(), parser.value("aliveTTL").toInt()};
+                 parser.value("aliveInterval").toInt(), parser.value("aliveTTL").toInt(),
+                 parser.value("execRegex")};
 
   return app.exec();
 }
